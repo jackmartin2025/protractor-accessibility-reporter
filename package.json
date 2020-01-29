@@ -1,0 +1,37 @@
+{
+  "name": "protractor-accessibility-reporter",
+  "version": "1.0.0",
+  "description": "Run accessibility audit using axe-webdriverjs. Export results in CSV.",
+  "main": "index.js",
+  "scripts": {
+    "test": "protractor test/config.js",
+    "update-webdriver": "npx webdriver-manager update"
+  },
+  "keywords": [
+    "accessibility",
+    "protractor",
+    "axe",
+    "angular",
+    "axe",
+    "report",
+    "csv"
+  ],
+  "author": "Jack Martin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackmartin2025/protractor-accessibility-reporter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jackmartin2025/protractor-accessibility-reporter/issues"
+  },
+  "homepage": "https://github.com/jackmartin2025/protractor-accessibility-reporter#readme",
+  "license": "MIT",
+  "dependencies": {
+    "axe-webdriverjs": "^2.3.0",
+    "csv-writer": "^1.6.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "protractor": "^5.4.2"
+  }
+}
