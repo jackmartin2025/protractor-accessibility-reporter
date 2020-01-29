@@ -2,8 +2,8 @@ const AxeBuilder = require('axe-webdriverjs')
 const createCsvWriter = require('csv-writer').createObjectCsvWriter
 
 // Variables
-const pluginConfig = {}
-const resultsSummary = []
+let pluginConfig = {}
+let resultsSummary = []
 let name = ''
 
 async function onPrepare() {
@@ -238,8 +238,6 @@ async function logResults() {
   ]
   console.log('')
   console.log(` ---------- Accessibility Audit Results - ${name} ----------`)
-
-  let impacts = []
   // For each result...
   for (let i = 0; i < resultsSummary.length; i += 1) {
     // Set colour depending on result.
@@ -251,8 +249,6 @@ async function logResults() {
     // Output result.
     console.log(colour, `${resultsSummary[i].result}: ${resultsSummary[i].name} (${resultsSummary[i].passes} passes, ${resultsSummary[i].fails} fails, ${resultsSummary[i].total} total)`)
 
-    impacts.push(resultsSummary[i].impact)
-
     passElements += resultsSummary[i].passElements.length
     failElements += resultsSummary[i].failElements.length
   }
@@ -261,15 +257,14 @@ async function logResults() {
 
   // If fail elements is not 0...
   if (failElements !== 0) {
-    // Filter the impacts.
-    impacts = filterImpacts(impacts)
-
     // For each pre defined impact...
     for (let i = 0; i < impactNames.length; i += 1) {
       // For each impact in the report
-      for (let x = 0; x < impacts.length; x += 1) {
+      for (let j = 0; j < resultsSummary.length; j += 1) {
         // If the impact is in the report, add 1 to counter.
-        if (impacts[x] === impactNames[i].name) impactNames[i].count += 1
+        if ((impactNames[i].name === resultsSummary[j].impact) && (resultsSummary[j].failElements.length > 0)) {
+          impactNames[i].count += 1
+        }
       }
       // Output how many impacts.
       console.log(impactNames[i].colour, `${impactNames[i].name.replace(/^\w/, c => c.toUpperCase())}: ${impactNames[i].count}`)
@@ -278,21 +273,21 @@ async function logResults() {
     console.log('')
   }
 
-  // Only output this text if writing to CSV.
-  const outputText = (pluginConfig.outputCSV && pluginConfig.outputCSVFolder !== null) ? ' More details are included in the report.' : ''
-
   // Log the pass percentage.
-  console.log('\x1b[37m', `This page had a ${Math.round((passes / (passes + fails)) * 100)}% pass rate.`)
+  console.log('\x1b[37m', `This page had a ${Math.round((passes / (passes + fails)) * 100)}% pass rate with ${passes} passes and ${fails} fails out of ${passes + fails} total tests.`)
   console.log('')
-  console.log('\x1b[37m', `The elements on this page had a ${Math.round((passElements / (passElements + failElements)) * 100)}% pass rate.${outputText}`)
+  console.log('\x1b[37m', `Within those ${passes + fails} total tests, ${(passElements + failElements)} elements were tested. ${passElements} passed and ${failElements} failed. The elements tested had a ${Math.round((passElements / (passElements + failElements)) * 100)}% pass rate.`)
   console.log('')
-  return fails
-}
+  // Only output this text if writing to CSV.
+  if ((pluginConfig.outputCSV && pluginConfig.outputCSVFolder !== null)) {
+    console.log('\x1b[37m', 'More details are included in the report.')
+    console.log('')
+  }
 
-function filterImpacts(impacts) {
-  return impacts.filter((el) => {
-    return el !== null
-  })
+  // Empty results.
+  resultsSummary = []
+
+  return fails
 }
 
 exports.runAxeTest = runAxeTest
