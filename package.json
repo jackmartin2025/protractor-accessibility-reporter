@@ -1,6 +1,6 @@
 {
   "name": "protractor-accessibility-reporter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Run accessibility audit using axe-webdriverjs. Export results in CSV.",
   "main": "index.js",
   "scripts": {
