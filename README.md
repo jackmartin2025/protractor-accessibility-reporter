@@ -1,17 +1,60 @@
-Protractor Accessibility Reporter
+# Protractor Accessibility Reporter
 
-This package will run an accessibility audit using axe-webdriverjs and output the results in the console. The results can also be configured to output as a .csv file to a desiered directory.
+protractor-accessibility-reporter will run an accessibility audit using axe-webdriverjs and output the results in the console. The results can also be configured to output as a .csv file to a desired directory.
 
-Similar to other protractor accessibility plugins, you can run the audit like...
+## Installation
 
-```
-runAxeTest('Test Name')
-```
-
-If there are no violations, this will result in a console output like...
+To install the package use the following command at root level:
 
 ```
- ---------- Accessibility Audit Results - City Lights Good ----------
+npm install --save protractor-accessibility-reporter
+```
+
+## Usage
+
+In your config file you should set your plugin options:
+
+```
+{
+ package: 'protractor-accessibility-reporter',
+  options: {
+   outputCSV: true,
+   outputCSVFolder: 'tests/testresults/accessibility',
+   exclude: [
+    'Ensures the document has only one main landmark and each iframe in the page has at most one main landmark',
+    'Ensures all page content is contained by landmarks'
+   ]
+ }
+}
+```
+
+Set outputCSV to false if you do not want to export all results.
+Add any tests to the exclude array that you do not want to run.
+
+In your test file:
+
+```
+const accessibility = require('protractor-accessibility-reporter')
+
+describe('W3C City Lights', () => {
+  it('There should be no violations', async () => {
+    await browser.waitForAngularEnabled(false)
+    await browser.get('https://www.w3.org/WAI/demos/bad/after/home.html')
+    expect(await acessibility.runAxeTest('City Lights Good')).toEqual(0)
+  })
+
+  it('There should be violations', async () => {
+    await browser.waitForAngularEnabled(false)
+    await browser.get('https://www.w3.org/WAI/demos/bad/before/home.html')
+    expect(await acessibility.runAxeTest('City Lights Bad')).toBeGreaterThan(0)
+  })
+})
+```
+
+This will result in the following output:
+
+```
+---------- Accessibility Audit Results - City Lights Good ----------
  PASS: Ensures aria-hidden='true' is not present on the document body. (1 passes, 0 fails, 1 total)
  PASS: Ensures each page has at least one mechanism for a user to bypass navigation and jump straight to the content (1 passes, 0 fails, 1 total)
  PASS: Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds (62 passes, 0 fails, 62 total)
@@ -38,13 +81,9 @@ If there are no violations, this will result in a console output like...
 
  This page had a 100% pass rate.
 
- This elements on this page had a 100% pass rate.
-```
+ The elements on this page had a 100% pass rate. More details are included in the report.
 
-If there are violations, you can expect to see a console output like...
-
-```
----------- Accessibility Audit Results - City Lights Bad ----------
+ ---------- Accessibility Audit Results - City Lights Bad ----------
  PASS: Ensures aria-hidden='true' is not present on the document body. (1 passes, 0 fails, 1 total)
  PASS: Ensures each page has at least one mechanism for a user to bypass navigation and jump straight to the content (1 passes, 0 fails, 1 total)
  FAIL: Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds (62 passes, 2 fails, 64 total)
@@ -98,41 +137,29 @@ If there are violations, you can expect to see a console output like...
 
  This page had a 89% pass rate.
 
- This elements on this page had a 91% pass rate.
+ The elements on this page had a 91% pass rate. More details are included in the report.
 ```
 
-This plugin can be configured to export test results in a .csv file and exclude certain accessibility tests...
+## Testing
 
-Add the folowing code to your config file to do this:
-
-```
-plugins: [
-  {
-    package: 'protractor-accessibility-reporter',
-      options: {
-      outputCSV: true,
-      outputCSVFolder: 'test/results',
-      exclude: [
-        'Ensures the document has only one main landmark and each iframe in the page has at most one main landmark',
-        'Ensures all page content is contained by landmarks'
-      ]
-    }
-  }
-]
-```
-
-Installation
-
-```
-npm install protractor-accessibility-reporter
-```
-
-Testing
+Install all modules:
 
 ```
 npm install
+```
 
+Update webdriver:
+
+```
 npm run update-webdriver
+```
 
+Run tests:
+
+```
 npm run test
 ```
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
